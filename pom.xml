@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.lockboxdb</groupId>
+	<artifactId>-lockboxdb-server</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>lockboxdb</name>
+	<description>LockBoxDB is designed to meet these critical needs by adhering to the General Data Protection Regulation (GDPR) and the principles of Authentication, Authorization, and Accounting (AAA).</description>
+	<properties>
+		<java.version>21</java.version>
+	</properties>
+
+	<dependencies>
+
+		<!-- https://mvnrepository.com/artifact/org.rocksdb/rocksdbjni -->
+		<dependency>
+			<groupId>org.rocksdb</groupId>
+			<artifactId>rocksdbjni</artifactId>
+			<version>9.5.2</version>
+		</dependency>
+
+	</dependencies>
+
+</project>
