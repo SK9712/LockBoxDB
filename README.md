@@ -32,6 +32,7 @@ LockBoxDB includes comprehensive logging and monitoring capabilities to track us
 * Column Level Security
 * Horizontal level privilege
 * Vertical level privilege
+* Maker-Checker
 * Data Masking
 * Table level Auditing
 * Purge and Archive
