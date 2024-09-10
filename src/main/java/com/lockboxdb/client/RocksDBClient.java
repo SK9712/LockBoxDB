@@ -91,8 +91,7 @@ public class RocksDBClient {
         ColumnFamilyHandle tableHandle = rocksDB.createColumnFamily(new
                 ColumnFamilyDescriptor(tableName.getBytes(StandardCharsets.UTF_8)));
         rocksDB.put(tableName.getBytes(StandardCharsets.UTF_8),
-                DBUtils.serialize(new Locket("number",
-                        new Integer(tableHandle.getID()))));
+                DBUtils.serialize(new Integer(tableHandle.getID())));
         RocksDBConfig.getColumnFamilyHandles().add(tableHandle);
     }
 
