@@ -1,10 +1,9 @@
 package com.lockboxdb.client;
 
 import com.lockboxdb.config.RocksDBConfig;
-import com.lockboxdb.datatypes.DataType;
-import com.lockboxdb.datatypes.StringType;
 
 import com.lockboxdb.utils.DBUtils;
+import com.lockboxdb.wrapper.Locket;
 import org.rocksdb.*;
 
 import java.nio.charset.StandardCharsets;
@@ -37,10 +36,9 @@ public class RocksDBClient {
             throws Exception {
         switch (type.toLowerCase()) {
             case "string":
-                DataType dataType = new StringType();
                 rocksDB.put(writeOptions,
                         key.getBytes(StandardCharsets.UTF_8),
-                        dataType.serialize(data));
+                        DBUtils.serialize(new Locket("string", data)));
                 break;
         }
     }
@@ -50,14 +48,13 @@ public class RocksDBClient {
             throws Exception {
         switch (type.toLowerCase()) {
             case "string":
-                DataType dataType = new StringType();
                 int handleId = ((Integer) DBUtils.deserialize(
                         rocksDB.get(tableName.getBytes(StandardCharsets.UTF_8)))).intValue();
 
                 ColumnFamilyHandle tableHandle = RocksDBConfig.getColumnFamilyHandles().get(handleId);
                 rocksDB.put(tableHandle,
                         key.getBytes(StandardCharsets.UTF_8),
-                        dataType.serialize(data));
+                        DBUtils.serialize(new Locket("string", data)));
                 break;
         }
     }
@@ -66,9 +63,8 @@ public class RocksDBClient {
             throws Exception {
         switch (type.toLowerCase()) {
             case "string":
-                DataType dataType = new StringType();
-                return dataType.deserialize(rocksDB.get(readOptions,
-                        key.getBytes(StandardCharsets.UTF_8)));
+                return ((Locket) DBUtils.deserialize(rocksDB.get(readOptions,
+                        key.getBytes(StandardCharsets.UTF_8)))).getPayload();
             default:
                 throw new RuntimeException("Invalid DataType");
         }
@@ -78,14 +74,13 @@ public class RocksDBClient {
             throws Exception {
         switch (type.toLowerCase()) {
             case "string":
-                DataType dataType = new StringType();
                 int handleId = ((Integer) DBUtils.deserialize(
                         rocksDB.get(tableName.getBytes(StandardCharsets.UTF_8)))).intValue();
 
                 ColumnFamilyHandle tableHandle = RocksDBConfig.getColumnFamilyHandles().get(handleId);
 
-                return dataType.deserialize(rocksDB.get(tableHandle,
-                        key.getBytes(StandardCharsets.UTF_8)));
+                return ((Locket) DBUtils.deserialize(rocksDB.get(tableHandle,
+                        key.getBytes(StandardCharsets.UTF_8)))).getPayload();
             default:
                 throw new RuntimeException("Invalid DataType");
         }
@@ -95,7 +90,9 @@ public class RocksDBClient {
             throws Exception {
         ColumnFamilyHandle tableHandle = rocksDB.createColumnFamily(new
                 ColumnFamilyDescriptor(tableName.getBytes(StandardCharsets.UTF_8)));
-        rocksDB.put(tableName.getBytes(StandardCharsets.UTF_8), DBUtils.serialize(new Integer(tableHandle.getID())));
+        rocksDB.put(tableName.getBytes(StandardCharsets.UTF_8),
+                DBUtils.serialize(new Locket("number",
+                        new Integer(tableHandle.getID()))));
         RocksDBConfig.getColumnFamilyHandles().add(tableHandle);
     }
 
