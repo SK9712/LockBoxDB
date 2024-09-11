@@ -1,8 +1,10 @@
 package com.lockboxdb.query;
 
+import com.lockboxdb.client.RocksDBClient;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlSelect;
 import org.apache.calcite.sql.parser.SqlParser;
+import org.rocksdb.RocksDB;
 
 public class LocketQueryProcessor {
 
@@ -22,11 +24,14 @@ public class LocketQueryProcessor {
         }
     }
 
-    public void executeQuery() {
+    public void executeQuery() throws Exception {
+        RocksDBClient rocksDBClient = RocksDBClient.getInstance();
         if (sqlNode instanceof SqlSelect) {
             SqlSelect sqlSelect = (SqlSelect) sqlNode;
-            System.out.println("Parsed SQL Node: " +
-                    sqlSelect.getFrom().toString());
+
+            if(sqlSelect.getSelectList().get(0).toString().equalsIgnoreCase("*")) {
+                System.out.println(rocksDBClient.readAll(sqlSelect.getFrom().toString()));
+            }
         }
     }
 }

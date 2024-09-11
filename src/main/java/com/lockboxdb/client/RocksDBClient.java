@@ -7,6 +7,8 @@ import com.lockboxdb.wrapper.Locket;
 import org.rocksdb.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RocksDBClient {
 
@@ -49,7 +51,7 @@ public class RocksDBClient {
         switch (type.toLowerCase()) {
             case "string":
                 int handleId = ((Integer) DBUtils.deserialize(
-                        rocksDB.get(tableName.getBytes(StandardCharsets.UTF_8)))).intValue();
+                        rocksDB.get(tableName.toUpperCase().getBytes(StandardCharsets.UTF_8)))).intValue();
 
                 ColumnFamilyHandle tableHandle = RocksDBConfig.getColumnFamilyHandles().get(handleId);
                 rocksDB.put(tableHandle,
@@ -86,11 +88,29 @@ public class RocksDBClient {
         }
     }
 
+    public List<Object> readAll(String tableName)
+            throws Exception {
+        List<Object> dataList = new ArrayList<>();
+        int handleId = ((Integer) DBUtils.deserialize(
+                rocksDB.get(tableName.getBytes(StandardCharsets.UTF_8)))).intValue();
+
+        ColumnFamilyHandle tableHandle = RocksDBConfig.getColumnFamilyHandles().get(handleId);
+
+        try (RocksIterator iterator = rocksDB.newIterator(tableHandle)) {
+            System.out.println("Iterating over column family:");
+            for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+                dataList.add(DBUtils.deserialize(iterator.value()));
+            }
+        }
+
+        return dataList;
+    }
+
     public void createTable(String tableName)
             throws Exception {
         ColumnFamilyHandle tableHandle = rocksDB.createColumnFamily(new
-                ColumnFamilyDescriptor(tableName.getBytes(StandardCharsets.UTF_8)));
-        rocksDB.put(tableName.getBytes(StandardCharsets.UTF_8),
+                ColumnFamilyDescriptor(tableName.toUpperCase().getBytes(StandardCharsets.UTF_8)));
+        rocksDB.put(tableName.toUpperCase().getBytes(StandardCharsets.UTF_8),
                 DBUtils.serialize(new Integer(tableHandle.getID())));
         RocksDBConfig.getColumnFamilyHandles().add(tableHandle);
     }
