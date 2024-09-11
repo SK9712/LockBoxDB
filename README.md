@@ -1,5 +1,6 @@
 ## Introduction:
 In today’s digital landscape, safeguarding sensitive information and ensuring compliance with data protection regulations is paramount. LockBoxDB is designed to meet these critical needs by adhering to the General Data Protection Regulation (GDPR) and the principles of Authentication, Authorization, and Accounting (AAA). This introduction will provide an overview of how LockBoxDB integrates these guidelines into its core functionalities to deliver a secure and compliant database solution.
+The philosophy is to prioritize data security and integrity as the core values of LockBoxDB.
 ### GDPR Compliance
 LockBoxDB is engineered with GDPR compliance at its heart, ensuring that personal data is handled with the utmost care and in accordance with European Union regulations. Key GDPR features include:
 
