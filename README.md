@@ -29,6 +29,16 @@ The system provides granular access control mechanisms to ensure that users only
 LockBoxDB includes comprehensive logging and monitoring capabilities to track user activities and changes within the database. This ensures transparency and accountability, making it easier to audit access and modifications, as well as to identify and respond to potential security incidents.
 
 ## Features:
+* Row-Level Security
+* Column Level Security
+* RBAC & ABAC
+* Maker-Checker
+* Data Masking
+* Table level Auditing
+* Purge and Archive
+* Right to be forgotten - Data Expiry
+* Encryption, Encoding and Hashing of data
+* Transaction Manager
 
 
 ## Conclusion
