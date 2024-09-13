@@ -4,34 +4,42 @@ import com.lockboxdb.client.RocksDBClient;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlSelect;
 import org.apache.calcite.sql.parser.SqlParser;
-import org.rocksdb.RocksDB;
 
 public class LocketQueryProcessor {
 
-    private SqlNode sqlNode;
+    private SqlParser.Config sqlConfig;
 
-    public LocketQueryProcessor(String query) {
-        try {
-            SqlParser.Config config = SqlParser
-                    .configBuilder().build();
-            // Create a SqlParser instance
-            SqlParser parser = SqlParser.create(query, config);
+    private SqlParser sqlParser;
 
-            // Parse the SQL query
-            sqlNode = parser.parseQuery();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+    private RocksDBClient rocksDBClient;
+
+    private static LocketQueryProcessor locketQueryProcessor = null;
+
+    private LocketQueryProcessor() {
+        sqlConfig = SqlParser
+                .configBuilder().build();
+        // Create a SqlParser instance
+        sqlParser = SqlParser.create("", sqlConfig);
+        rocksDBClient = RocksDBClient.getInstance();
     }
 
-    public void executeQuery() throws Exception {
-        RocksDBClient rocksDBClient = RocksDBClient.getInstance();
+    public static LocketQueryProcessor getInstance() {
+        if(locketQueryProcessor == null) {
+            locketQueryProcessor = new LocketQueryProcessor();
+        }
+        return locketQueryProcessor;
+    }
+
+    public Object executeQuery(String sqlString) throws Exception {
+        SqlNode sqlNode = sqlParser.parseQuery(sqlString);
+
         if (sqlNode instanceof SqlSelect) {
             SqlSelect sqlSelect = (SqlSelect) sqlNode;
 
             if(sqlSelect.getSelectList().get(0).toString().equalsIgnoreCase("*")) {
-                System.out.println(rocksDBClient.readAll(sqlSelect.getFrom().toString()));
+                return rocksDBClient.readAll(sqlSelect.getFrom().toString());
             }
         }
+        return null;
     }
 }
