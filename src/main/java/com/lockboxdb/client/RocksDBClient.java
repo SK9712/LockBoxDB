@@ -9,6 +9,7 @@ import org.rocksdb.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class RocksDBClient {
 
@@ -61,6 +62,24 @@ public class RocksDBClient {
         }
     }
 
+    public void write(String tableName, String key,
+                      Map<String, Locket> data)
+            throws Exception {
+        int handleId = ((Integer) DBUtils.deserialize(
+                rocksDB.get(tableName.toUpperCase().getBytes(StandardCharsets.UTF_8)))).intValue();
+
+        ColumnFamilyHandle tableHandle = RocksDBConfig.getColumnFamilyHandles().get(handleId);
+        rocksDB.put(tableHandle,
+                key.getBytes(StandardCharsets.UTF_8),
+                DBUtils.serialize(data));
+    }
+
+    public Map<String, Locket> read(String key)
+            throws Exception {
+        return (Map<String, Locket>) DBUtils.deserialize(rocksDB.get(readOptions,
+                key.getBytes(StandardCharsets.UTF_8)));
+    }
+
     public Object read(String key, String type)
             throws Exception {
         switch (type.toLowerCase()) {
@@ -88,9 +107,9 @@ public class RocksDBClient {
         }
     }
 
-    public List<Object> readAll(String tableName)
+    public List<Map<String, Locket>> readAll(String tableName)
             throws Exception {
-        List<Object> dataList = new ArrayList<>();
+        List<Map<String, Locket>> dataList = new ArrayList<>();
         int handleId = ((Integer) DBUtils.deserialize(
                 rocksDB.get(tableName.getBytes(StandardCharsets.UTF_8)))).intValue();
 
@@ -99,7 +118,7 @@ public class RocksDBClient {
         try (RocksIterator iterator = rocksDB.newIterator(tableHandle)) {
             System.out.println("Iterating over column family:");
             for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-                dataList.add(DBUtils.deserialize(iterator.value()));
+                dataList.add((Map<String, Locket>) DBUtils.deserialize(iterator.value()));
             }
         }
 

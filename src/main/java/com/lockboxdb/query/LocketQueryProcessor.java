@@ -1,9 +1,15 @@
 package com.lockboxdb.query;
 
 import com.lockboxdb.client.RocksDBClient;
+import com.lockboxdb.wrapper.Locket;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlSelect;
 import org.apache.calcite.sql.parser.SqlParser;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class LocketQueryProcessor {
 
@@ -38,6 +44,14 @@ public class LocketQueryProcessor {
 
             if(sqlSelect.getSelectList().get(0).toString().equalsIgnoreCase("*")) {
                 return rocksDBClient.readAll(sqlSelect.getFrom().toString());
+            } else {
+                List<Map<String, Locket>> rocksData = rocksDBClient.readAll(sqlSelect.getFrom().toString());
+                List<Map<String, Locket>> newData =
+                rocksData.stream().map(data->{
+                    Map<String, Locket> tempData = new HashMap<>();
+                    sqlSelect.getSelectList().stream().forEach(column->tempData.put(column.toString(), data.get(column.toString())));
+                    return tempData;
+                }).collect(Collectors.toList());
             }
         }
         return null;
