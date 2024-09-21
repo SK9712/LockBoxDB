@@ -2,13 +2,13 @@ package com.lockboxdb.wrapper;
 
 import java.io.Serializable;
 
-public class Locket implements Serializable {
+public class LockBoxData implements Serializable {
 
     private String dataType;
 
     private Object payload;
 
-    public Locket(String dataType, Object payload) {
+    public LockBoxData(String dataType, Object payload) {
         this.dataType = dataType;
         this.payload = payload;
     }

@@ -3,7 +3,7 @@ package com.lockboxdb.client;
 import com.lockboxdb.config.RocksDBConfig;
 
 import com.lockboxdb.utils.DBUtils;
-import com.lockboxdb.wrapper.Locket;
+import com.lockboxdb.wrapper.LockBoxData;
 import org.rocksdb.*;
 
 import java.nio.charset.StandardCharsets;
@@ -41,7 +41,7 @@ public class RocksDBClient {
             case "string":
                 rocksDB.put(writeOptions,
                         key.getBytes(StandardCharsets.UTF_8),
-                        DBUtils.serialize(new Locket("string", data)));
+                        DBUtils.serialize(new LockBoxData("string", data)));
                 break;
         }
     }
@@ -57,13 +57,13 @@ public class RocksDBClient {
                 ColumnFamilyHandle tableHandle = RocksDBConfig.getColumnFamilyHandles().get(handleId);
                 rocksDB.put(tableHandle,
                         key.getBytes(StandardCharsets.UTF_8),
-                        DBUtils.serialize(new Locket("string", data)));
+                        DBUtils.serialize(new LockBoxData("string", data)));
                 break;
         }
     }
 
     public void write(String tableName, String key,
-                      Map<String, Locket> data)
+                      Map<String, LockBoxData> data)
             throws Exception {
         int handleId = ((Integer) DBUtils.deserialize(
                 rocksDB.get(tableName.toUpperCase().getBytes(StandardCharsets.UTF_8)))).intValue();
@@ -74,9 +74,9 @@ public class RocksDBClient {
                 DBUtils.serialize(data));
     }
 
-    public Map<String, Locket> read(String key)
+    public Map<String, LockBoxData> read(String key)
             throws Exception {
-        return (Map<String, Locket>) DBUtils.deserialize(rocksDB.get(readOptions,
+        return (Map<String, LockBoxData>) DBUtils.deserialize(rocksDB.get(readOptions,
                 key.getBytes(StandardCharsets.UTF_8)));
     }
 
@@ -84,7 +84,7 @@ public class RocksDBClient {
             throws Exception {
         switch (type.toLowerCase()) {
             case "string":
-                return ((Locket) DBUtils.deserialize(rocksDB.get(readOptions,
+                return ((LockBoxData) DBUtils.deserialize(rocksDB.get(readOptions,
                         key.getBytes(StandardCharsets.UTF_8)))).getPayload();
             default:
                 throw new RuntimeException("Invalid DataType");
@@ -100,16 +100,16 @@ public class RocksDBClient {
 
                 ColumnFamilyHandle tableHandle = RocksDBConfig.getColumnFamilyHandles().get(handleId);
 
-                return ((Locket) DBUtils.deserialize(rocksDB.get(tableHandle,
+                return ((LockBoxData) DBUtils.deserialize(rocksDB.get(tableHandle,
                         key.getBytes(StandardCharsets.UTF_8)))).getPayload();
             default:
                 throw new RuntimeException("Invalid DataType");
         }
     }
 
-    public List<Map<String, Locket>> readAll(String tableName)
+    public List<Map<String, LockBoxData>> readAll(String tableName)
             throws Exception {
-        List<Map<String, Locket>> dataList = new ArrayList<>();
+        List<Map<String, LockBoxData>> dataList = new ArrayList<>();
         int handleId = ((Integer) DBUtils.deserialize(
                 rocksDB.get(tableName.getBytes(StandardCharsets.UTF_8)))).intValue();
 
@@ -118,7 +118,7 @@ public class RocksDBClient {
         try (RocksIterator iterator = rocksDB.newIterator(tableHandle)) {
             System.out.println("Iterating over column family:");
             for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-                dataList.add((Map<String, Locket>) DBUtils.deserialize(iterator.value()));
+                dataList.add((Map<String, LockBoxData>) DBUtils.deserialize(iterator.value()));
             }
         }
 

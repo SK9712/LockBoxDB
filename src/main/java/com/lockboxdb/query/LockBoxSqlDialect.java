@@ -2,11 +2,10 @@ package com.lockboxdb.query;
 
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlDialect;
-import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlWriter;
 
-public class LocketSqlDialect extends SqlDialect {
-    public LocketSqlDialect(Context context) {
+public class LockBoxSqlDialect extends SqlDialect {
+    public LockBoxSqlDialect(Context context) {
         super(context);
     }
 
