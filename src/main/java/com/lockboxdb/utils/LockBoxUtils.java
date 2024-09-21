@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-public class DBUtils {
+public class LockBoxUtils {
 
     public static byte[] serialize(Object data) {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

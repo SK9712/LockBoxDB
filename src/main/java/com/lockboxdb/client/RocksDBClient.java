@@ -2,7 +2,7 @@ package com.lockboxdb.client;
 
 import com.lockboxdb.config.RocksDBConfig;
 
-import com.lockboxdb.utils.DBUtils;
+import com.lockboxdb.utils.LockBoxUtils;
 import com.lockboxdb.wrapper.LockBoxData;
 import org.rocksdb.*;
 
@@ -41,7 +41,7 @@ public class RocksDBClient {
             case "string":
                 rocksDB.put(writeOptions,
                         key.getBytes(StandardCharsets.UTF_8),
-                        DBUtils.serialize(new LockBoxData("string", data)));
+                        LockBoxUtils.serialize(new LockBoxData("string", data)));
                 break;
         }
     }
@@ -51,13 +51,13 @@ public class RocksDBClient {
             throws Exception {
         switch (type.toLowerCase()) {
             case "string":
-                int handleId = ((Integer) DBUtils.deserialize(
+                int handleId = ((Integer) LockBoxUtils.deserialize(
                         rocksDB.get(tableName.toUpperCase().getBytes(StandardCharsets.UTF_8)))).intValue();
 
                 ColumnFamilyHandle tableHandle = RocksDBConfig.getColumnFamilyHandles().get(handleId);
                 rocksDB.put(tableHandle,
                         key.getBytes(StandardCharsets.UTF_8),
-                        DBUtils.serialize(new LockBoxData("string", data)));
+                        LockBoxUtils.serialize(new LockBoxData("string", data)));
                 break;
         }
     }
@@ -65,18 +65,18 @@ public class RocksDBClient {
     public void write(String tableName, String key,
                       Map<String, LockBoxData> data)
             throws Exception {
-        int handleId = ((Integer) DBUtils.deserialize(
+        int handleId = ((Integer) LockBoxUtils.deserialize(
                 rocksDB.get(tableName.toUpperCase().getBytes(StandardCharsets.UTF_8)))).intValue();
 
         ColumnFamilyHandle tableHandle = RocksDBConfig.getColumnFamilyHandles().get(handleId);
         rocksDB.put(tableHandle,
                 key.getBytes(StandardCharsets.UTF_8),
-                DBUtils.serialize(data));
+                LockBoxUtils.serialize(data));
     }
 
     public Map<String, LockBoxData> read(String key)
             throws Exception {
-        return (Map<String, LockBoxData>) DBUtils.deserialize(rocksDB.get(readOptions,
+        return (Map<String, LockBoxData>) LockBoxUtils.deserialize(rocksDB.get(readOptions,
                 key.getBytes(StandardCharsets.UTF_8)));
     }
 
@@ -84,7 +84,7 @@ public class RocksDBClient {
             throws Exception {
         switch (type.toLowerCase()) {
             case "string":
-                return ((LockBoxData) DBUtils.deserialize(rocksDB.get(readOptions,
+                return ((LockBoxData) LockBoxUtils.deserialize(rocksDB.get(readOptions,
                         key.getBytes(StandardCharsets.UTF_8)))).getPayload();
             default:
                 throw new RuntimeException("Invalid DataType");
@@ -95,12 +95,12 @@ public class RocksDBClient {
             throws Exception {
         switch (type.toLowerCase()) {
             case "string":
-                int handleId = ((Integer) DBUtils.deserialize(
+                int handleId = ((Integer) LockBoxUtils.deserialize(
                         rocksDB.get(tableName.getBytes(StandardCharsets.UTF_8)))).intValue();
 
                 ColumnFamilyHandle tableHandle = RocksDBConfig.getColumnFamilyHandles().get(handleId);
 
-                return ((LockBoxData) DBUtils.deserialize(rocksDB.get(tableHandle,
+                return ((LockBoxData) LockBoxUtils.deserialize(rocksDB.get(tableHandle,
                         key.getBytes(StandardCharsets.UTF_8)))).getPayload();
             default:
                 throw new RuntimeException("Invalid DataType");
@@ -110,7 +110,7 @@ public class RocksDBClient {
     public List<Map<String, LockBoxData>> readAll(String tableName)
             throws Exception {
         List<Map<String, LockBoxData>> dataList = new ArrayList<>();
-        int handleId = ((Integer) DBUtils.deserialize(
+        int handleId = ((Integer) LockBoxUtils.deserialize(
                 rocksDB.get(tableName.getBytes(StandardCharsets.UTF_8)))).intValue();
 
         ColumnFamilyHandle tableHandle = RocksDBConfig.getColumnFamilyHandles().get(handleId);
@@ -118,7 +118,7 @@ public class RocksDBClient {
         try (RocksIterator iterator = rocksDB.newIterator(tableHandle)) {
             System.out.println("Iterating over column family:");
             for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-                dataList.add((Map<String, LockBoxData>) DBUtils.deserialize(iterator.value()));
+                dataList.add((Map<String, LockBoxData>) LockBoxUtils.deserialize(iterator.value()));
             }
         }
 
@@ -130,7 +130,7 @@ public class RocksDBClient {
         ColumnFamilyHandle tableHandle = rocksDB.createColumnFamily(new
                 ColumnFamilyDescriptor(tableName.toUpperCase().getBytes(StandardCharsets.UTF_8)));
         rocksDB.put(tableName.toUpperCase().getBytes(StandardCharsets.UTF_8),
-                DBUtils.serialize(new Integer(tableHandle.getID())));
+                LockBoxUtils.serialize(new Integer(tableHandle.getID())));
         RocksDBConfig.getColumnFamilyHandles().add(tableHandle);
     }
 
