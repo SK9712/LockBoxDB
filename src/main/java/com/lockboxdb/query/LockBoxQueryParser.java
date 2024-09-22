@@ -4,6 +4,8 @@ import com.lockboxdb.client.RocksDBClient;
 import com.lockboxdb.wrapper.LockBoxData;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlSelect;
+import org.apache.calcite.sql.ddl.SqlColumnDeclaration;
+import org.apache.calcite.sql.ddl.SqlCreateTable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +14,22 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public enum LockBoxQueryParser {
+    CREATE_TABLE {
+        public Object lockBoxParse(SqlNode sqlNode) throws Exception {
+            SqlCreateTable sqlCreateTable = (SqlCreateTable) sqlNode;
+            String tableName = sqlCreateTable.name.toString();
+            Map<String, String> columnDefinitions = new HashMap<>();
+
+            sqlCreateTable.columnList.stream()
+                    .map(data->((SqlColumnDeclaration) data))
+                    .forEach(data->columnDefinitions.put(data.name.toString(), data.dataType.toString()));
+
+            RocksDBClient.getInstance().createTable(tableName, columnDefinitions);
+
+            return tableName + " created successfully";
+        }
+    },
+
     SELECT {
         public Object lockBoxParse(SqlNode sqlNode) throws Exception {
             SqlSelect sqlSelect = (SqlSelect) sqlNode;

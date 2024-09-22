@@ -1,9 +1,15 @@
 package com.lockboxdb.query;
 
+import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.*;
+import org.apache.calcite.sql.ddl.SqlDdlNodes;
+import org.apache.calcite.sql.dialect.MysqlSqlDialect;
 import org.apache.calcite.sql.dialect.PostgresqlSqlDialect;
 import org.apache.calcite.sql.parser.SqlParser;
+import org.apache.calcite.sql.parser.ddl.SqlDdlParserImpl;
+import org.apache.calcite.sql.parser.impl.SqlParserImpl;
 import org.apache.calcite.sql.util.SqlString;
+import org.apache.calcite.sql.validate.SqlConformanceEnum;
 
 public class LockBoxQueryProcessor {
 
@@ -14,10 +20,14 @@ public class LockBoxQueryProcessor {
     private static LockBoxQueryProcessor locketQueryProcessor = null;
 
     private LockBoxQueryProcessor() {
-        sqlConfig = SqlParser
-                .configBuilder().build();
+        sqlConfig = SqlParser.Config.DEFAULT
+                .withParserFactory(SqlParserImpl.FACTORY);
         // Create a SqlParser instance
-        sqlParser = SqlParser.create("", sqlConfig);
+        sqlParser = SqlParser.create("", SqlParser.configBuilder()
+                .setParserFactory(SqlDdlParserImpl.FACTORY)
+                .setConformance(SqlConformanceEnum.MYSQL_5)
+                .setLex(Lex.MYSQL)
+                .build());
     }
 
     public static LockBoxQueryProcessor getInstance() {
@@ -36,7 +46,7 @@ public class LockBoxQueryProcessor {
     }
 
     private SqlString validateSql(SqlNode sqlNode) {
-        SqlDialect dialect = PostgresqlSqlDialect.DEFAULT; // You can switch this to MysqlSqlDialect.DEFAULT
+        SqlDialect dialect = MysqlSqlDialect.DEFAULT; // You can switch this to MysqlSqlDialect.DEFAULT
 
         return sqlNode.toSqlString(dialect);
     }

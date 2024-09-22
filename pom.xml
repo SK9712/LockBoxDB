@@ -27,6 +27,12 @@
 			<version>1.37.0</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.calcite/calcite-server -->
+		<dependency>
+			<groupId>org.apache.calcite</groupId>
+			<artifactId>calcite-server</artifactId>
+			<version>1.37.0</version>
+		</dependency>
 	</dependencies>
 
 </project>

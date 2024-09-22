@@ -111,7 +111,7 @@ public class RocksDBClient {
             throws Exception {
         List<Map<String, LockBoxData>> dataList = new ArrayList<>();
         int handleId = ((Integer) LockBoxUtils.deserialize(
-                rocksDB.get(tableName.getBytes(StandardCharsets.UTF_8)))).intValue();
+                rocksDB.get(tableName.toUpperCase().getBytes(StandardCharsets.UTF_8)))).intValue();
 
         ColumnFamilyHandle tableHandle = RocksDBConfig.getColumnFamilyHandles().get(handleId);
 
@@ -125,12 +125,16 @@ public class RocksDBClient {
         return dataList;
     }
 
-    public void createTable(String tableName)
+    public void createTable(String tableName, Map<String, String> columnDefinitions)
             throws Exception {
         ColumnFamilyHandle tableHandle = rocksDB.createColumnFamily(new
                 ColumnFamilyDescriptor(tableName.toUpperCase().getBytes(StandardCharsets.UTF_8)));
+
         rocksDB.put(tableName.toUpperCase().getBytes(StandardCharsets.UTF_8),
                 LockBoxUtils.serialize(new Integer(tableHandle.getID())));
+        rocksDB.put((tableName.toUpperCase() + "_SCHEMA").getBytes(StandardCharsets.UTF_8),
+                LockBoxUtils.serialize(columnDefinitions));
+
         RocksDBConfig.getColumnFamilyHandles().add(tableHandle);
     }
 
